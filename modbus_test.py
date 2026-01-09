@@ -105,10 +105,37 @@ def continuous_monitoring():
     finally:
         client.close()
 
+def read_all_registers():
+    client = get_client()
+    if not client.connect(): return
+
+    for i in range(0, 59):
+        res_data = client.read_holding_registers(address=i, count=1, device_id=SLAVE_ID)
+        res_sw = client.read_holding_registers(address=50, count=1, device_id=SLAVE_ID)
+        
+        if not res_data.isError() and not res_sw.isError():
+            print("="*40)
+            print(f"register\t-> {i}")
+            print(f"data\t\t-> {res_data.registers[0]}")
+            sw = res_sw.registers[0]
+            status_str = "FAULT" if (sw & 0x0008) else "READY"
+            if sw & 0x0004: status_str = "RUNNING"
+
+            if status_str == "FAULT":
+                return
+
+            print(status_str)
+            
+
+        time.sleep(0.5)
+    client.close()
+
+
 if __name__ == "__main__":
     while True:
         print("\n1. Test Connessione e Fault\n2. Monitoraggio Continuo\n0. Esci")
         scelta = input("Scelta: ")
         if scelta == "1": test_connection()
         elif scelta == "2": continuous_monitoring()
+        elif scelta == "3": read_all_registers()
         elif scelta == "0": break
