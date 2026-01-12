@@ -6,14 +6,14 @@ SRC_DIR = src
 INC_DIR = include
 BUILD_DIR = build
 
-LIB_SRC = $(SRC_DIR)/acs_130_modbus.c
+LIB_SRC = $(SRC_DIR)/acs_310_modbus.c
 MAIN_SRC = $(SRC_DIR)/main.c
 
-LIB_OBJ = $(BUILD_DIR)/acs_130_modbus.o
+LIB_OBJ = $(BUILD_DIR)/acs_310_modbus.o
 MAIN_OBJ = $(BUILD_DIR)/main.o
 
-LIB_STATIC = libacs_130_modbus.a
-LIB_SHARED = libacs_130_modbus.so
+LIB_STATIC = libacs_310_modbus.a
+LIB_SHARED = libacs_310_modbus.so
 MAIN_TARGET = $(BUILD_DIR)/main
 
 .PHONY: all static shared clean directories
@@ -31,7 +31,7 @@ $(MAIN_TARGET): $(MAIN_OBJ) $(LIB_STATIC)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(BUILD_DIR)/main_shared: $(MAIN_OBJ) $(LIB_SHARED)
-	$(CC) $(CFLAGS) -o $@ $(MAIN_OBJ) -L. -lacs_130_modbus $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $(MAIN_OBJ) -L. -lacs_310_modbus $(LDFLAGS)
 
 $(LIB_STATIC): $(LIB_OBJ)
 	ar rcs $@ $^
