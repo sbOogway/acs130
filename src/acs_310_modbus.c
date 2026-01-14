@@ -170,3 +170,44 @@ void read_all_registers(void) {
     modbus_close(ctx);
     modbus_free(ctx);
 }
+
+void read_single_register(void) {
+    modbus_t *ctx = get_client();
+    if (!ctx) return;
+
+    if (modbus_connect(ctx) == -1) {
+        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
+        modbus_free(ctx);
+        return;
+    }
+
+    printf("\n========================================\n");
+    printf("READ SINGLE REGISTER\n");
+    printf("========================================\n");
+
+    printf("Enter register address: ");
+    fflush(stdout);
+
+    char input[20];
+    if (fgets(input, sizeof(input), stdin) == NULL) {
+        modbus_close(ctx);
+        modbus_free(ctx);
+        return;
+    }
+
+    int addr = atoi(input);
+    if (addr < 0) {
+        printf("Invalid address\n");
+        modbus_close(ctx);
+        modbus_free(ctx);
+        return;
+    }
+
+    uint16_t value;
+    if (read_register(ctx, addr, &value) == 0) {
+        printf("Register %d value: %u\n", addr, value);
+    }
+
+    modbus_close(ctx);
+    modbus_free(ctx);
+}
