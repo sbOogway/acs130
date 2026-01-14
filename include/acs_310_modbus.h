@@ -10,12 +10,14 @@ extern "C" {
 typedef struct _modbus modbus_t;
 
 int read_register(modbus_t *ctx, int addr, uint16_t *value);
+int write_register(modbus_t *ctx, int addr, uint16_t value);
 modbus_t* get_client(void);
 void check_faults(modbus_t *ctx);
 void test_connection(void);
 void continuous_monitoring(void);
 void read_all_registers(void);
 void read_single_register(void);
+void write_single_register(void);
 
 #ifdef __cplusplus
 }

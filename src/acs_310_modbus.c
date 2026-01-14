@@ -22,6 +22,15 @@ int read_register(modbus_t *ctx, int addr, uint16_t *value) {
     return 0;
 }
 
+int write_register(modbus_t *ctx, int addr, uint16_t value) {
+    int rc = modbus_write_register(ctx, addr, value);
+    if (rc == -1) {
+        fprintf(stderr, "Failed to write register %d: %s\n", addr, modbus_strerror(errno));
+        return -1;
+    }
+    return 0;
+}
+
 modbus_t* get_client(void) {
     modbus_t *ctx = modbus_new_rtu(SERIAL_PORT, BAUDRATE, PARITY, DATA_BITS, STOP_BITS);
     if (!ctx) {
@@ -206,6 +215,57 @@ void read_single_register(void) {
     uint16_t value;
     if (read_register(ctx, addr, &value) == 0) {
         printf("Register %d value: %u\n", addr, value);
+    }
+
+    modbus_close(ctx);
+    modbus_free(ctx);
+}
+
+void write_single_register(void) {
+    modbus_t *ctx = get_client();
+    if (!ctx) return;
+
+    if (modbus_connect(ctx) == -1) {
+        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
+        modbus_free(ctx);
+        return;
+    }
+
+    printf("\n========================================\n");
+    printf("WRITE SINGLE REGISTER\n");
+    printf("========================================\n");
+
+    printf("Enter register address: ");
+    fflush(stdout);
+
+    char addr_input[20];
+    if (fgets(addr_input, sizeof(addr_input), stdin) == NULL) {
+        modbus_close(ctx);
+        modbus_free(ctx);
+        return;
+    }
+
+    int addr = atoi(addr_input);
+    if (addr < 0) {
+        printf("Invalid address\n");
+        modbus_close(ctx);
+        modbus_free(ctx);
+        return;
+    }
+
+    printf("Enter value to write: ");
+    fflush(stdout);
+
+    char value_input[20];
+    if (fgets(value_input, sizeof(value_input), stdin) == NULL) {
+        modbus_close(ctx);
+        modbus_free(ctx);
+        return;
+    }
+
+    uint16_t value = atoi(value_input);
+    if (write_register(ctx, addr, value) == 0) {
+        printf("Successfully wrote %u to register %d\n", value, addr);
     }
 
     modbus_close(ctx);
