@@ -16,6 +16,8 @@ void check_faults(modbus_t *ctx);
 void test_connection(void);
 void continuous_monitoring(void);
 void read_all_registers(void);
+void read_single_register(void);
+void write_single_register(void);
 
 #ifdef __cplusplus
 }
