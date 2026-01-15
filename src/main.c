@@ -1,6 +1,7 @@
-#include "acs_310_modbus.h"
+#include "../include/acs_310_modbus.h"
 #include <modbus/modbus.h>
 #include <stdio.h>
+#include <stdint.h>
 
 int main(void) {
     modbus_t *ctx = get_client();
@@ -21,7 +22,7 @@ int main(void) {
     char choice[10];
 
     while (1) {
-        printf("\n1. Test Connection and Fault\n2. Continuous Monitoring\n3. Read All Registers\n0. Exit\n");
+        printf("\n1. Test Connection and Fault\n2. Continuous Monitoring\n3. Read All Registers\n4. Write to Register\n0. Exit\n");
         printf("Choice: ");
         fflush(stdout);
 
@@ -33,6 +34,26 @@ int main(void) {
             continuous_monitoring();
         } else if (choice[0] == '3') {
             read_all_registers();
+        } else if (choice[0] == '4') {
+            int addr;
+            uint16_t value;
+            printf("Enter register address: ");
+            fflush(stdout);
+            if (scanf("%d", &addr) == 1) {
+                printf("Enter value to write: ");
+                fflush(stdout);
+                if (scanf("%hu", &value) == 1) {
+                    if (write_register(ctx, addr, value) == 0) {
+                        printf("Successfully wrote %u to register %d\n", value, addr);
+                    }
+                } else {
+                    printf("Invalid value\n");
+                }
+            } else {
+                printf("Invalid address\n");
+            }
+            // Clear input buffer
+            while (getchar() != '\n');
         } else if (choice[0] == '0') {
             break;
         }

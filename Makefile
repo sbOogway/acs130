@@ -9,6 +9,8 @@ BUILD_DIR = build
 LIB_SRC = $(SRC_DIR)/acs_310_modbus.c
 MAIN_SRC = $(SRC_DIR)/main.c
 
+COMMON_CONTROL_INC = -I/usr/local/include/common-control -lcommon-control
+
 LIB_OBJ = $(BUILD_DIR)/acs_310_modbus.o
 MAIN_OBJ = $(BUILD_DIR)/main.o
 
@@ -28,10 +30,11 @@ static: directories $(LIB_STATIC)
 shared: directories $(LIB_SHARED)
 
 $(MAIN_TARGET): $(MAIN_OBJ) $(LIB_STATIC)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(COMMON_CONTROL_INC) 
 
 $(BUILD_DIR)/main_shared: $(MAIN_OBJ) $(LIB_SHARED)
-	$(CC) $(CFLAGS) -o $@ $(MAIN_OBJ) -L. -lacs_310_modbus $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $(MAIN_OBJ) -L. -lacs_310_modbus $(LDFLAGS) $(COMMON_CONTROL_INC) 
+
 
 $(LIB_STATIC): $(LIB_OBJ)
 	ar rcs $@ $^
