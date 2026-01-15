@@ -236,6 +236,73 @@ void set_reference(modbus_t *ctx, float reference) {
         LOG_INFO("Reference  must be between 0 and MAX_OUTPUT .\n");
         return;
     }
-    uint16_t ref_value = (uint16_t)(reference); 
+    uint16_t ref_value = (uint16_t)(reference);
     send_command(ctx, REF_1, ref_value);
+}
+
+void read_single_register(void) {
+    modbus_t *ctx = get_client();
+    if (!ctx) return;
+
+    if (modbus_connect(ctx) == -1) {
+        LOG_ERROR("Connection failed: %s\n", modbus_strerror(errno));
+        modbus_free(ctx);
+        return;
+    }
+
+    printf("Enter register address: ");
+    fflush(stdout);
+    int addr;
+    if (scanf("%d", &addr) != 1 || addr < 0) {
+        LOG_ERROR("Invalid address\n");
+        modbus_close(ctx);
+        modbus_free(ctx);
+        return;
+    }
+
+    uint16_t value;
+    if (read_register(ctx, addr, &value) == 0) {
+        printf("Register %d value: %u\n", addr, value);
+    }
+
+    modbus_close(ctx);
+    modbus_free(ctx);
+}
+
+void write_single_register(void) {
+    modbus_t *ctx = get_client();
+    if (!ctx) return;
+
+    if (modbus_connect(ctx) == -1) {
+        LOG_ERROR("Connection failed: %s\n", modbus_strerror(errno));
+        modbus_free(ctx);
+        return;
+    }
+
+    printf("Enter register address: ");
+    fflush(stdout);
+    int addr;
+    if (scanf("%d", &addr) != 1 || addr < 0) {
+        LOG_ERROR("Invalid address\n");
+        modbus_close(ctx);
+        modbus_free(ctx);
+        return;
+    }
+
+    printf("Enter value to write: ");
+    fflush(stdout);
+    uint16_t value;
+    if (scanf("%hu", &value) != 1) {
+        LOG_ERROR("Invalid value\n");
+        modbus_close(ctx);
+        modbus_free(ctx);
+        return;
+    }
+
+    if (write_register(ctx, addr, value) == 0) {
+        printf("Successfully wrote %u to register %d\n", value, addr);
+    }
+
+    modbus_close(ctx);
+    modbus_free(ctx);
 }
